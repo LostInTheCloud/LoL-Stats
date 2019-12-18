@@ -7,20 +7,22 @@ SERVERLIST = ['NA', 'JP', 'PBE', 'EUW', 'RU', 'KR', 'BR', 'OC', 'EUNE']
 
 
 def handle_response_code(response_raw, request_url):
+    time.sleep(60/200)
     resp = response_raw
-    while resp.status_code == 429:
-        '''rate limit exceeded, slowing down'''
+    while resp.status_code == 429 or resp.status_code == 503:
+        print('rate limit exceeded, slowing down')
         time.sleep(10)
         resp = req.get(request_url)
 
-    if resp.status_code is not 200:
-        if resp.status_code is 401:
+    if resp.status_code != 200:
+        if resp.status_code == 401:
             print('API Key is outdated\nShutting down...')
-        elif resp.status_code is 404:
+        elif resp.status_code == 404:
             print('Summoner Name not found!\nShutting down...')
         else:
             print('something went wrong: Error Code ' + str(resp.status_code) + '\nShutting down...')
         exit(1)
+    return resp
 
 
 def wizard() -> (str, str):
@@ -57,7 +59,7 @@ def getthis(url: str) -> str:
     request_url = BASE_URL + url + KEY_PARAM
     print('GET | ' + request_url)
     response_raw = req.get(request_url)
-    handle_response_code(response_raw, request_url)
+    response_raw = handle_response_code(response_raw, request_url)
     return response_raw.json()
 
 
@@ -83,7 +85,7 @@ def get_match_id(summoner_name: str, index: int) -> str:
         summoner_name) + KEY_PARAM + '&endIndex=' + str(index + 1) + '&beginIndex=' + str(index)
     print('GET | ' + request_url)
     response_raw = req.get(request_url)
-    handle_response_code(response_raw, request_url)
+    response_raw = handle_response_code(response_raw, request_url)
     return response_raw.json()['matches'][0]['gameId']
 
 
