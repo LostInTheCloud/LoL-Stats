@@ -71,9 +71,34 @@ def get_mastery_score(summoner_name: str) -> str:
     return str(getthis('/lol/champion-mastery/v4/scores/by-summoner/' + get_summoner_id(summoner_name)))
 
 
-SERVER = 'EUW'
-NAME = 'SMALLYELLOWONE'
+def get_number_of_games(summoner_name: str) -> str:
+    response = getthis('/lol/match/v4/matchlists/by-account/' + get_account_id(summoner_name))
+    return response['totalGames']
 
+
+def get_match_id(summoner_name: str, index: int) -> str:
+    request_url = BASE_URL + '/lol/match/v4/matchlists/by-account/' + get_account_id(
+        summoner_name) + KEY_PARAM + '&endIndex=' + str(index + 1) + '&beginIndex=' + str(index)
+    print('GET | ' + request_url)
+    response_raw = req.get(request_url)
+    handle_response_code(response_raw, request_url)
+    return response_raw.json()['matches'][0]['gameId']
+
+
+def get_players(match_id: str):
+    response = getthis('/lol/match/v4/matches/' + str(match_id))['participantIdentities']
+    players = [a['player']['summonerName'] for a in response]
+    print(players)
+
+
+SERVER = 'EUW'
+NAME = 'BWUAH'
+ACCOUNT_ID = get_account_id(NAME)
 BASE_URL, KEY_PARAM = setup_url(SERVER)
 
-print(get_account_id(NAME))
+numberofgames = get_number_of_games(NAME)
+print('Games played: ' + str(numberofgames))
+for index in range(int(numberofgames)):
+    print('\nChecking Game ' + str(index+1) + '/' + str(numberofgames))
+    match_id = get_match_id(NAME, index)
+    get_players(match_id)
