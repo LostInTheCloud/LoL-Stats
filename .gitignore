@@ -6,3 +6,5 @@ venv/
 log.txt
 
 log_complete.txt
+
+__pycache__/

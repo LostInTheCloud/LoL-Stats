@@ -100,19 +100,8 @@ def get_players(match_id: str):
 
 
 SERVER = 'EUW'
-BASE_URL, KEY_PARAM = setup_url(SERVER)
 NAME = 'BWUAH'
+if SERVER is None or NAME is None:
+    NAME, SERVER = wizard()
+BASE_URL, KEY_PARAM = setup_url(SERVER)
 ACCOUNT_ID = get_account_id(NAME)
-
-print(ACCOUNT_ID)
-
-f = open("log.txt", "w")
-numberofgames = get_number_of_games(NAME)
-print('Games played: ' + str(numberofgames))
-for index in range(int(numberofgames)):
-    print('\nChecking Game ' + str(index + 1) + '/' + str(numberofgames))
-    match_id = get_match_id(NAME, index)
-    players = get_players(match_id)
-    print(players)
-    f.write(str(index + 1) + '/' + str(numberofgames) + ' ' + str(str(players).encode("utf-8")) + '\n')
-f.close()
