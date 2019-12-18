@@ -84,9 +84,14 @@ def get_number_of_games(summoner_name: str) -> str:
     return response_raw.json()['totalGames']
 
 
-def get_match_id(summoner_name: str, index: int) -> str:
-    request_url = BASE_URL + '/lol/match/v4/matchlists/by-account/' + get_account_id(
-        summoner_name) + KEY_PARAM + '&endIndex=' + str(index + 1) + '&beginIndex=' + str(index)
+def get_match_id(index: int, summoner_name=None, account_id=None) -> str:
+    if account_id is None:
+        if summoner_name is None or summoner_name == NAME:
+            account_id = ACCOUNT_ID
+        else:
+            account_id = get_account_id(summoner_name)
+    request_url = BASE_URL + '/lol/match/v4/matchlists/by-account/' + account_id + KEY_PARAM + '&endIndex=' + str(
+        index + 1) + '&beginIndex=' + str(index)
     print('GET | ' + request_url)
     response_raw = req.get(request_url)
     response_raw = handle_response_code(response_raw, request_url)
