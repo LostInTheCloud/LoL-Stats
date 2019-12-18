@@ -8,3 +8,6 @@ log.txt
 log_complete.txt
 
 __pycache__/
+
+output
+APIKEY.txt

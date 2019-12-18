@@ -1,13 +1,45 @@
 # -*- coding: utf-8 -*-
 import requests as req
 import time
+import os
 
 print('Welcome to LoL Stats\n')
 
-API_KEY = 'RGAPI-ac7693f6-d0e9-43ad-b535-3ca4336e78f1'
+API_KEY = None
+while API_KEY is None:
+    try:
+        f = open("APIKEY.txt", "r")
+        API_KEY = f.read()
+        f.close()
 
-if API_KEY is None:
-    API_KEY = input('Enter your API Key ')
+        # check if API KEY is valid and not timed out.
+
+        response = req.get('https://euw1.api.riotgames.com/lol/status/v3/shard-data?api_key=' + API_KEY)
+        if response.status_code in {400, 404, 405, 415, 500, 502, 503, 504}:
+            print('ERROR ' + str(response.status_code) + '/nShutting down.\n')
+            input('Press enter to continue...')
+            exit(1)
+
+        if response.status_code == 401:
+            print('API KEY is outdated\nDeleting outdated key')
+            os.remove("APIKEY.txt")
+            API_KEY = None
+
+        if response.status_code == 403:
+            print('API Key is invalid\nDeleting invalid key')
+            os.remove("APIKEY.txt")
+            API_KEY = None
+
+    except IOError:
+        print("API KEY not found")
+        API_KEY = input(
+            "An API KEY is required to access Riots Database.\n"
+            "You can find your API KEY on\nhttps://developer.riotgames.com/\n"
+            "Enter your API KEY: ")
+        f = open("APIKEY.txt", "w")
+        f.write(API_KEY)
+        f.close()
+        API_KEY = None
 
 SERVERLIST = ['NA', 'JP', 'PBE', 'EUW', 'RU', 'KR', 'BR', 'OC', 'EUNE']
 
@@ -29,6 +61,7 @@ def handle_response_code(response_raw, request_url):
             print('Summoner Name not found!\nShutting down...')
         else:
             print('something went wrong: Error Code ' + str(resp.status_code) + '\nShutting down...')
+        input("Press enter to exit...")
         exit(1)
     return resp
 
@@ -43,6 +76,7 @@ def setup_url(server):
     server = server.upper()
     if server not in set(SERVERLIST):
         print('Unsupported Server\nShutting down...')
+        input("Press enter to exit...")
         exit(1)
 
     server = server + '1'
