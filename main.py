@@ -7,11 +7,11 @@ SERVERLIST = ['NA', 'JP', 'PBE', 'EUW', 'RU', 'KR', 'BR', 'OC', 'EUNE']
 
 
 def handle_response_code(response_raw, request_url):
-    time.sleep(60/200)
+    time.sleep(0.5)
     resp = response_raw
     while resp.status_code == 429 or resp.status_code == 503:
         print('rate limit exceeded, slowing down')
-        time.sleep(10)
+        time.sleep(30)
         resp = req.get(request_url)
 
     if resp.status_code != 200:
