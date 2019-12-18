@@ -3,7 +3,7 @@ import requests as req
 import time
 import os
 
-print('Welcome to LoL Stats\n')
+print('Welcome to LoL Stats by TheBwuah')
 
 API_KEY = None
 while API_KEY is None:
