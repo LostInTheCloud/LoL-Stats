@@ -1,6 +1,6 @@
 import main
 
-f = open("log.txt", "w", encoding='utf-8')
+f = open("previous players.txt", "w", encoding='utf-8')
 numberofgames = main.get_number_of_games(main.NAME)
 print('Games played: ' + str(numberofgames))
 for index in range(int(numberofgames)):
@@ -14,5 +14,3 @@ for index in range(int(numberofgames)):
         f.write(player + ', ')
     f.write('\n')
 f.close()
-
-input("Press enter to exit...")
