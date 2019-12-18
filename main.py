@@ -2,7 +2,7 @@
 import requests as req
 import time
 
-API_KEY = 'RGAPI-1248e2cc-18c4-4b2d-ae38-6a7793eb77e8'
+API_KEY = 'RGAPI-ac7693f6-d0e9-43ad-b535-3ca4336e78f1'
 SERVERLIST = ['NA', 'JP', 'PBE', 'EUW', 'RU', 'KR', 'BR', 'OC', 'EUNE']
 
 
@@ -76,8 +76,12 @@ def get_mastery_score(summoner_name: str) -> str:
 
 
 def get_number_of_games(summoner_name: str) -> str:
-    response = getthis('/lol/match/v4/matchlists/by-account/' + get_account_id(summoner_name))
-    return response['totalGames']
+    request_url = BASE_URL + '/lol/match/v4/matchlists/by-account/' + get_account_id(
+        summoner_name) + KEY_PARAM + '&endIndex=99999&beginIndex=99999'
+    print('GET | ' + request_url)
+    response_raw = req.get(request_url)
+    response_raw = handle_response_code(response_raw, request_url)
+    return response_raw.json()['totalGames']
 
 
 def get_match_id(summoner_name: str, index: int) -> str:
@@ -99,6 +103,8 @@ SERVER = 'EUW'
 BASE_URL, KEY_PARAM = setup_url(SERVER)
 NAME = 'BWUAH'
 ACCOUNT_ID = get_account_id(NAME)
+
+print(ACCOUNT_ID)
 
 f = open("log.txt", "w")
 numberofgames = get_number_of_games(NAME)
