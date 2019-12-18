@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import requests as req
 import time
 
@@ -6,18 +7,19 @@ SERVERLIST = ['NA', 'JP', 'PBE', 'EUW', 'RU', 'KR', 'BR', 'OC', 'EUNE']
 
 
 def handle_response_code(response_raw, request_url):
-    if response_raw.status_code is 429:
+    resp = response_raw
+    while resp.status_code == 429:
         '''rate limit exceeded, slowing down'''
-        time.sleep(1)
-        response_raw = req.get(request_url)
+        time.sleep(10)
+        resp = req.get(request_url)
 
-    if response_raw.status_code is not 200:
-        if response_raw.status_code is 401:
+    if resp.status_code is not 200:
+        if resp.status_code is 401:
             print('API Key is outdated\nShutting down...')
-        elif response_raw.status_code is 404:
+        elif resp.status_code is 404:
             print('Summoner Name not found!\nShutting down...')
         else:
-            print('something went wrong: Error Code ' + str(response_raw.status_code) + '\nShutting down...')
+            print('something went wrong: Error Code ' + str(resp.status_code) + '\nShutting down...')
         exit(1)
 
 
@@ -88,17 +90,21 @@ def get_match_id(summoner_name: str, index: int) -> str:
 def get_players(match_id: str):
     response = getthis('/lol/match/v4/matches/' + str(match_id))['participantIdentities']
     players = [a['player']['summonerName'] for a in response]
-    print(players)
+    return players
 
 
 SERVER = 'EUW'
+BASE_URL, KEY_PARAM = setup_url(SERVER)
 NAME = 'BWUAH'
 ACCOUNT_ID = get_account_id(NAME)
-BASE_URL, KEY_PARAM = setup_url(SERVER)
 
+f = open("log.txt", "w")
 numberofgames = get_number_of_games(NAME)
 print('Games played: ' + str(numberofgames))
 for index in range(int(numberofgames)):
-    print('\nChecking Game ' + str(index+1) + '/' + str(numberofgames))
+    print('\nChecking Game ' + str(index + 1) + '/' + str(numberofgames))
     match_id = get_match_id(NAME, index)
-    get_players(match_id)
+    players = get_players(match_id)
+    print(players)
+    f.write(str(index + 1) + '/' + str(numberofgames) + ' ' + str(str(players).encode("utf-8")) + '\n')
+f.close()
