@@ -2,7 +2,13 @@
 import requests as req
 import time
 
+print('Welcome to LoL Stats\n')
+
 API_KEY = 'RGAPI-ac7693f6-d0e9-43ad-b535-3ca4336e78f1'
+
+if API_KEY is None:
+    API_KEY = input('Enter your API Key ')
+
 SERVERLIST = ['NA', 'JP', 'PBE', 'EUW', 'RU', 'KR', 'BR', 'OC', 'EUNE']
 
 
@@ -17,6 +23,8 @@ def handle_response_code(response_raw, request_url):
     if resp.status_code != 200:
         if resp.status_code == 401:
             print('API Key is outdated\nShutting down...')
+        elif resp.status_code == 403:
+            print('API Key is invalid\nShutting down...')
         elif resp.status_code == 404:
             print('Summoner Name not found!\nShutting down...')
         else:
@@ -26,12 +34,8 @@ def handle_response_code(response_raw, request_url):
 
 
 def wizard() -> (str, str):
-    print('Welcome to LoL Stats\n')
-
     summoner_name = input("enter your Summoner Name ")
-
     server = input("enter your Server ")
-
     return summoner_name, server
 
 
@@ -104,8 +108,8 @@ def get_players(match_id: str):
     return players
 
 
-SERVER = 'EUW'
-NAME = 'BWUAH'
+SERVER = None
+NAME = None
 if SERVER is None or NAME is None:
     NAME, SERVER = wizard()
 BASE_URL, KEY_PARAM = setup_url(SERVER)
